@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <title>India CO₂ Emission Predictor</title>
+    <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+    <div class="container">
+        <h1>India CO₂ Emissions Per Capita</h1>
+        <p class="subtitle">
+            Predict emissions and understand contributing factors
+        </p>
+
+        <!-- Input -->
+        <div class="input-box">
+            <input type="number" id="yearInput" placeholder="Enter year (e.g. 2030)" />
+            <button onclick="predict()">Predict</button>
+        </div>
+
+        <!-- Result -->
+        <div id="result" class="result hidden">
+            <h2>Prediction for <span id="resultYear"></span></h2>
+            <p class="co2-value">
+                CO₂ per capita: <strong><span id="co2Value"></span> tons</strong>
+            </p>
+
+            <h3>Factor Contributions</h3>
+            <ul id="contributions"></ul>
+        </div>
+
+        <!-- Error -->
+        <p id="error" class="error hidden"></p>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
