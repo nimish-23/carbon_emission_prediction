@@ -8,58 +8,64 @@ body {
 .container {
     max-width: 600px;
     margin: 60px auto;
-    background: white;
-    padding: 30px;
-    border-radius: 8px;
-    box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+    background: #ffffff;
+    padding: 32px;
+    border-radius: 10px;
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.1);
 }
 
 h1 {
     text-align: center;
+    margin-bottom: 10px;
 }
 
 .subtitle {
     text-align: center;
     color: #666;
     margin-bottom: 30px;
+    font-size: 14px;
 }
 
 .input-box {
     display: flex;
-    gap: 10px;
+    gap: 12px;
 }
 
 input {
     flex: 1;
-    padding: 10px;
+    padding: 12px;
     font-size: 16px;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+}
+
+input:focus {
+    outline: none;
+    border-color: #007bff;
 }
 
 button {
-    padding: 10px 20px;
+    padding: 12px 22px;
     font-size: 16px;
     cursor: pointer;
+    border: none;
+    border-radius: 6px;
+    background-color: #007bff;
+    color: white;
+}
+
+button:hover {
+    background-color: #0056b3;
 }
 
 .result {
     margin-top: 30px;
+    text-align: center;
 }
 
 .co2-value {
-    font-size: 18px;
-    margin-bottom: 15px;
-}
-
-ul {
-    list-style: none;
-    padding: 0;
-}
-
-li {
-    padding: 8px;
-    background: #eef2f7;
-    margin-bottom: 6px;
-    border-radius: 4px;
+    font-size: 20px;
+    margin-top: 10px;
 }
 
 .hidden {
@@ -67,7 +73,8 @@ li {
 }
 
 .error {
-    color: red;
+    color: #d9534f;
     margin-top: 20px;
     text-align: center;
+    font-size: 14px;
 }

@@ -1,10 +1,12 @@
 async function predict() {
-    const year = document.getElementById("yearInput").value;
+    const yearInput = document.getElementById("yearInput");
     const resultDiv = document.getElementById("result");
     const errorDiv = document.getElementById("error");
 
     resultDiv.classList.add("hidden");
     errorDiv.classList.add("hidden");
+
+    const year = yearInput.value;
 
     if (!year) {
         errorDiv.textContent = "Please enter a year.";
@@ -29,16 +31,8 @@ async function predict() {
 
         // Update UI
         document.getElementById("resultYear").textContent = data.year;
-        document.getElementById("co2Value").textContent = data.predicted_co2_per_capita;
-
-        const contributionsList = document.getElementById("contributions");
-        contributionsList.innerHTML = "";
-
-        for (const [factor, value] of Object.entries(data.factor_contributions)) {
-            const li = document.createElement("li");
-            li.textContent = `${factor}: ${value}`;
-            contributionsList.appendChild(li);
-        }
+        document.getElementById("co2Value").textContent =
+            data.predicted_co2_per_capita.toFixed(3);
 
         resultDiv.classList.remove("hidden");
 
