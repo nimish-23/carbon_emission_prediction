@@ -2,11 +2,7 @@ from flask import Flask, request, jsonify, send_from_directory
 from flask_cors import CORS
 import joblib
 import pandas as pd
-import numpy as np
 
-# ============================================================================
-# LOAD MODELS
-# ============================================================================
 
 # Load existing models
 driver_models = joblib.load("models/driver_models.pkl")
@@ -18,10 +14,45 @@ training_stats = joblib.load("models/training_stats.pkl")
 
 FEATURES = [
     "energy_per_capita",
-    "fossil_energy_per_capita",
-    "renewables_share_energy",
+    "fossil_share_energy",
     "energy_per_gdp"
 ]
+
+POLICY_DOMAIN_MAP = {
+    "energy_per_capita": {
+        "theme": "Energy Demand Reduction",
+        "description": "High total energy consumption across households, transport, and industry",
+        "policy_areas": [
+            "Public transport expansion",
+            "Energy-efficient buildings",
+            "Urban planning and densification",
+            "Appliance efficiency standards",
+            "Behavioral energy conservation"
+        ]
+    },
+    "fossil_share_energy": {
+        "theme": "Energy Supply Decarbonization",
+        "description": "High dependence on fossil fuels in the energy mix",
+        "policy_areas": [
+            "Renewable energy scale-up",
+            "Coal phase-down",
+            "Grid modernization",
+            "Energy storage deployment",
+            "Carbon pricing mechanisms"
+        ]
+    },
+    "energy_per_gdp": {
+        "theme": "Economic Energy Efficiency",
+        "description": "Low energy efficiency of economic output",
+        "policy_areas": [
+            "Industrial efficiency programs",
+            "Technology modernization",
+            "Electrification of industry",
+            "Process optimization"
+        ]
+    }
+}
+
 
 print("="*70)
 print("🚀 MODELS LOADED SUCCESSFULLY")
@@ -31,16 +62,9 @@ print(f"✓ CO2 model loaded")
 print(f"✓ SHAP explainer loaded (baseline: {training_stats['baseline']:.4f})")
 print("="*70)
 
-# ============================================================================
-# FLASK APP SETUP
-# ============================================================================
 
 app = Flask(__name__, static_folder="src", static_url_path="")
 CORS(app)
-
-# ============================================================================
-# HELPER FUNCTIONS
-# ============================================================================
 
 def predict_drivers_for_year(year: int) -> dict:
     """Predict energy drivers for a given year using trained trend models"""
@@ -57,10 +81,10 @@ def predict_co2_from_drivers(drivers_pred: dict) -> float:
     """Predict CO2 per capita from projected drivers"""
     X = pd.DataFrame([drivers_pred])[FEATURES]
     co2_pred = float(co2_model.predict(X)[0])
+
     return co2_pred
 
 
-# NEW FUNCTION
 def explain_prediction_with_shap(drivers_pred: dict) -> dict:
     """
     Explain a CO2 prediction using SHAP values
@@ -108,9 +132,50 @@ def explain_prediction_with_shap(drivers_pred: dict) -> dict:
         'percentages': percentages
     }
 
-# ============================================================================
-# ROUTES
-# ============================================================================
+
+def build_responsibility_profile(explanation: dict, threshold: float = 5.0):
+    """
+    Build a structured responsibility profile from SHAP output
+    """
+    profile = []
+
+    for feature, pct in explanation["percentages"].items():
+        profile.append({
+            "factor": feature,
+            "impact_percent": pct,
+            "impact_value": explanation["contributions"][feature],
+            "policy_relevant": pct >= threshold,
+            "policy_context": POLICY_DOMAIN_MAP.get(feature, {})
+        })
+
+    # Sort by importance
+    profile.sort(key=lambda x: x["impact_percent"], reverse=True)
+    return profile
+
+def generate_policy_insights(responsibility_profile: list) -> list:
+    """
+    Generate policy insights from responsibility profile.
+    This is where GenAI will later be plugged in.
+    """
+    insights = []
+
+    for item in responsibility_profile:
+        if not item["policy_relevant"]:
+            continue
+
+        context = item["policy_context"]
+
+        insights.append({
+            "factor": item["factor"],
+            "theme": context.get("theme"),
+            "why_it_matters": context.get("description"),
+            "policy_focus": context.get("policy_areas"),
+            "model_signal": f"Accounts for {item['impact_percent']:.1f}% of the predicted emissions impact"
+        })
+
+    return insights
+
+
 
 @app.route("/")
 def index():
@@ -118,40 +183,7 @@ def index():
     return send_from_directory("src", "index.html")
 
 
-@app.route("/predict", methods=["POST"])
-def predict():
-    """Basic prediction endpoint (unchanged)"""
-    data = request.get_json()
 
-    # Validate input
-    if not data or "year" not in data:
-        return jsonify({"error": "Missing 'year' in request"}), 400
-
-    year = data["year"]
-
-    if not isinstance(year, int):
-        return jsonify({"error": "'year' must be an integer"}), 400
-
-    if year < 1965 or year > 2100:
-        return jsonify({"error": "Year out of supported range"}), 400
-
-    # 1. Predict drivers
-    drivers_pred = predict_drivers_for_year(year)
-
-    # 2. Predict CO2
-    co2_pred = predict_co2_from_drivers(drivers_pred)
-
-    # 3. Response
-    return jsonify({
-        "year": year,
-        "predicted_co2_per_capita": round(co2_pred, 3),
-        "projected_drivers": {
-            k: round(v, 3) for k, v in drivers_pred.items()
-        }
-    })
-
-
-# NEW ENDPOINT
 @app.route("/predict/explain", methods=["POST"])
 def predict_explain():
     """
@@ -242,18 +274,51 @@ def generate_interpretation(explanation: dict) -> str:
     
     return "; ".join(interpretations)
 
+@app.route("/predict/explain-policy", methods=["POST"])
+def predict_explain_policy():
+    """
+    Prediction + SHAP explanation + Policy insights
+    """
+    data = request.get_json()
 
-# ============================================================================
-# MAIN
-# ============================================================================
+    if not data or "year" not in data:
+        return jsonify({"error": "Missing 'year' in request"}), 400
+
+    year = data["year"]
+
+    if not isinstance(year, int):
+        return jsonify({"error": "'year' must be an integer"}), 400
+
+    try:
+        drivers_pred = predict_drivers_for_year(year)
+        explanation = explain_prediction_with_shap(drivers_pred)
+
+        responsibility_profile = build_responsibility_profile(explanation)
+        policy_insights = generate_policy_insights(responsibility_profile)
+
+        return jsonify({
+            "year": year,
+            "predicted_co2_per_capita": round(explanation["prediction"], 3),
+            "baseline": round(explanation["baseline"], 3),
+            "responsibility_profile": responsibility_profile,
+            "policy_insights": policy_insights,
+            "note": (
+                "Policy insights are generated by interpreting model explanations. "
+                "They are indicative, not prescriptive."
+            )
+        })
+
+    except Exception as e:
+        return jsonify({"error": f"Policy explanation failed: {str(e)}"}), 500
+
+
 
 if __name__ == "__main__":
     print("\n" + "="*70)
     print("🌍 India CO₂ Emissions Prediction API")
     print("="*70)
     print("\nAvailable endpoints:")
-    print("  • POST /predict         - Basic prediction")
-    print("  • POST /predict/explain - Prediction with SHAP explanation")
+    print("  • POST /predict/explain - CO₂ prediction with SHAP explanation")
     print("\n" + "="*70 + "\n")
     
     app.run(debug=True)

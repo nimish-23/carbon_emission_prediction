@@ -84,23 +84,23 @@ This end-to-end machine learning project predicts India's future CO₂ emissions
 
 ```
 carbon_emission_prediction/
-├── app.py                          # Flask API server (259 lines)
-├── requirements.txt                # Python dependencies
+├── app.py                         - Flask API server
+├── requirements.txt               - Python dependencies
 ├── data/
-│   ├── owid-co2-data.csv          # Historical CO₂ emissions
-│   └── owid-energy-data.csv       # Energy consumption data
+│   ├── owid-co2-data.csv          - Historical CO₂ emissions
+│   └── owid-energy-data.csv       - Energy consumption data
 ├── models/
-│   ├── driver_models.pkl          # 4 energy trend models
-│   ├── co2_model.pkl              # CO₂ regression model
-│   ├── shap_explainer.pkl         # SHAP explainer object
-│   └── training_stats.pkl         # Model metadata & baseline
+│   ├── driver_models.pkl          - 4 energy trend models
+│   ├── co2_model.pkl              - CO₂ regression model
+│   ├── shap_explainer.pkl         - SHAP explainer object
+│   └── training_stats.pkl         - Model metadata & baseline
 ├── notebooks/
-│   ├── carbon_emission.ipynb      # Initial EDA & modeling
-│   └── carbon_emission_2.ipynb    # Advanced model development
-└── src/                            # Frontend application
-    ├── index.html                 # Minimalist UI
-    ├── script.js                  # Client logic + explanations
-    └── style.css                  # Modern responsive design
+│   ├── carbon_emission.ipynb      - Initial EDA & modeling
+│   └── carbon_emission_2.ipynb    - Advanced model development
+└── src/                           - Frontend application
+    ├── index.html                 - Minimalist UI
+    ├── script.js                  - Client logic + explanations
+    └── style.css                  - Modern responsive design
 ```
 
 ---
