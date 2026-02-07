@@ -20,7 +20,15 @@
                 id="yearInput" 
                 placeholder="Enter year (e.g. 2030)" 
             />
-            <button onclick="predict()">Predict</button>
+        </div>
+
+        <button onclick="predictWithExplanation()" class="btn-explain">
+            🔍 Predict & Explain
+        </button>
+
+        <div id="explanation-section" style="display: none; margin-top: 30px;">
+            <h3>📊 Explanation</h3>
+            <div id="explanation-content"></div>
         </div>
 
         <!-- Result -->
