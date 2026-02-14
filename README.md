@@ -101,7 +101,6 @@ This end-to-end machine learning project predicts India's future CO₂ emissions
 The codebase is organized into focused packages for maintainability:
 
 - **`core/`** - ML model loading, predictions, and SHAP explanations
-- **`policy/`** - Policy domain mapping and responsibility profiling
 - **`genai/`** - LLM integration with Ollama/Llama3.2 for policy recommendations
 - **`utils/`** - Input validation and helper functions
 - **`app.py`** - Flask API with Ollama server management
@@ -112,27 +111,32 @@ The codebase is organized into focused packages for maintainability:
 
 ```
 carbon_emission_prediction/
-├── app.py                         - Flask API server (thin entrypoint)
+├── app.py                         - Flask API server with Ollama management
 ├── requirements.txt               - Python dependencies
+├── generate_policy.py             - Standalone policy generation script
+├── test_genai.py                  - GenAI integration tests
+├── test_api_genai.py              - API endpoint tests for GenAI features
+├── test_detailed.py               - Detailed testing utilities
+├── quick_test.py                  - Quick validation tests
+├── api_response.json              - Sample API response for testing
 ├── core/                          - ML prediction & SHAP logic
+│   ├── __init__.py               - Package initialization
 │   ├── model_loader.py           - Model loading & constants
 │   ├── prediction.py             - Driver & CO₂ predictions
 │   ├── shap_explainer.py         - SHAP explanation generation
 │   └── interpretation.py         - Human-readable interpretations
-├── policy/                        - Policy analysis modules
-│   ├── policy_map.py             - Policy domain mappings
-│   ├── responsibility.py         - Responsibility profiling
-│   └── policy_engine.py          - Policy insight generation
 ├── genai/                         - GenAI integration for policy insights
+│   ├── __init__.py               - Package initialization
 │   ├── prompts.py                - LLM prompt templates for policy analysis
 │   ├── ollama_client.py          - Ollama API client wrapper
 │   ├── summarizer.py             - PolicySummarizer for LLM-powered recommendations
 │   └── policy_context.py         - India-specific climate policy context
 ├── utils/                         - Utilities & helpers
+│   ├── __init__.py               - Package initialization
 │   └── validators.py             - Input validation
 ├── data/
-│   ├── owid-co2-data.csv         - Historical CO₂ emissions
-│   └── owid-energy-data.csv      - Energy consumption data
+│   ├── owid-co2-data.csv         - Historical CO₂ emissions (1965-2022)
+│   └── owid-energy-data.csv      - Energy consumption data (1965-2022)
 ├── models/
 │   ├── driver_models.pkl         - 4 energy trend models
 │   ├── co2_model.pkl             - CO₂ regression model
@@ -443,16 +447,11 @@ The modular structure makes development more organized:
 - Update SHAP explanations in `core/shap_explainer.py`
 - Change model loading in `core/model_loader.py`
 
-**Policy Analysis** (`policy/`):
-
-- Add new policy domains to `policy/policy_map.py`
-- Update profiling logic in `policy/responsibility.py`
-- Enhance policy insights in `policy/policy_engine.py`
-
 **API Layer** (`app.py`):
 
 - Add new endpoints to `app.py`
-- Routes are thin and delegate to core/policy modules
+- Manage Ollama server lifecycle
+- Routes delegate to core and genai modules
 
 **GenAI Integration** (`genai/`):
 
