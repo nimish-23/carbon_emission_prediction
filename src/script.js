@@ -61,6 +61,15 @@ async function predictWithExplanation() {
     return;
   }
 
+  const yearNum = parseInt(year);
+  
+  // Validate year range
+  if (yearNum < 1965 || yearNum > 2100) {
+    errorDiv.textContent = "Please enter a year between 1965 and 2100.";
+    errorDiv.classList.remove("hidden");
+    return;
+  }
+
   // Show loading state
   btnExplain.textContent = "⏳ Generating predictions & policy insights...";
   btnExplain.disabled = true;
@@ -236,3 +245,16 @@ function displayPolicyRecommendations(policyInsights, genaiEnabled) {
     
     policySection.innerHTML = html;
 }
+
+// Add Enter key support for the year input
+document.addEventListener('DOMContentLoaded', function() {
+    const yearInput = document.getElementById('yearInput');
+    if (yearInput) {
+        yearInput.addEventListener('keypress', function(event) {
+            if (event.key === 'Enter') {
+                event.preventDefault();
+                predictWithExplanation();
+            }
+        });
+    }
+});

@@ -17,8 +17,8 @@ This end-to-end machine learning project predicts India's future CO₂ emissions
 
 - **Two-Stage Forecasting Pipeline**: Energy drivers → CO₂ predictions
 - **Explainable AI**: SHAP-powered feature importance analysis
-- **Policy Insights**: Automated policy recommendations based on model explanations
-- **Modular Architecture**: Clean separation of ML, policy, and API logic
+- **GenAI Policy Recommendations**: LLM-powered insights using Ollama/Llama3.2
+- **Modular Architecture**: Clean separation of ML, policy, and GenAI logic
 - **Modern Minimalist UI**: Clean, responsive interface with focus-driven design
 - **Production-Ready API**: RESTful Flask backend with comprehensive error handling
 - **Smart Data Strategy**: Recent-window forecasting for renewables to capture structural break (2015+)
@@ -33,17 +33,26 @@ This end-to-end machine learning project predicts India's future CO₂ emissions
 - **SHAP Explanations**: Understand feature contributions to each prediction
 - **Adaptive Modeling**: Recent-window strategy for renewables growth trend
 
+### 🧠 GenAI Integration
+
+- **LLM-Powered Insights**: Context-aware policy recommendations using Llama3.2
+- **Local Ollama Integration**: Privacy-preserving AI running on your machine
+- **Intelligent Analysis**: Interprets SHAP explanations to generate actionable climate policy recommendations
+- **India-Specific Context**: Tailored to India's climate policy landscape and energy transition priorities
+
 ### 🎨 User Interface
 
 - **Minimalist Design**: No-scroll layout with clean, modern aesthetics
+- **Dual Analysis Modes**: ML explanations + GenAI policy insights side-by-side
 - **Dynamic UX**: Input form transforms into results-only view
-- **Instant Predictions**: Enter year → get prediction + explanation
+- **Instant Predictions**: Enter year → get prediction + explanation + policy recommendations
 - **Visual Explanations**: Feature contribution bars with percentage breakdowns
 
 ### 🔌 API
 
 - `/predict/explain` - CO₂ predictions with SHAP feature explanations
-- `/predict/explain-policy` - Predictions with policy insights and recommendations
+- `/predict/explain-policy` - Predictions with GenAI-powered policy recommendations
+- Automatic Ollama server management on app startup
 - Comprehensive error handling and validation
 
 ---
@@ -77,13 +86,13 @@ This end-to-end machine learning project predicts India's future CO₂ emissions
                      │
                      ▼
 ┌─────────────────────────────────────────────────────────┐
-│          Policy Insight Generation (Optional)            │
-│  Responsibility Profiling + Policy Recommendations       │
+│      GenAI Policy Recommendation Engine (Ollama)         │
+│   Llama3.2 analyzes SHAP + India climate context        │
 └────────────────────┬────────────────────────────────────┘
                      │
                      ▼
 ┌─────────────────────────────────────────────────────────┐
-│    CO₂ Prediction + Explanation + Policy Insights       │
+│   CO₂ Prediction + SHAP Explanation + AI Policy Recs   │
 └─────────────────────────────────────────────────────────┘
 ```
 
@@ -92,10 +101,10 @@ This end-to-end machine learning project predicts India's future CO₂ emissions
 The codebase is organized into focused packages for maintainability:
 
 - **`core/`** - ML model loading, predictions, and SHAP explanations
-- **`policy/`** - Policy domain mapping and insight generation
+- **`policy/`** - Policy domain mapping and responsibility profiling
+- **`genai/`** - LLM integration with Ollama/Llama3.2 for policy recommendations
 - **`utils/`** - Input validation and helper functions
-- **`genai/`** - Future AI-powered enhancements (stubs)
-- **`app.py`** - Thin Flask API layer (routes only)
+- **`app.py`** - Flask API with Ollama server management
 
 ---
 
@@ -114,10 +123,11 @@ carbon_emission_prediction/
 │   ├── policy_map.py             - Policy domain mappings
 │   ├── responsibility.py         - Responsibility profiling
 │   └── policy_engine.py          - Policy insight generation
-├── genai/                         - Future GenAI integration (stubs)
-│   ├── prompts.py                - Prompt templates (placeholder)
-│   ├── ollama_client.py          - Ollama API wrapper (stub)
-│   └── summarizer.py             - Policy summarizer (stub)
+├── genai/                         - GenAI integration for policy insights
+│   ├── prompts.py                - LLM prompt templates for policy analysis
+│   ├── ollama_client.py          - Ollama API client wrapper
+│   ├── summarizer.py             - PolicySummarizer for LLM-powered recommendations
+│   └── policy_context.py         - India-specific climate policy context
 ├── utils/                         - Utilities & helpers
 │   └── validators.py             - Input validation
 ├── data/
@@ -145,7 +155,32 @@ carbon_emission_prediction/
 
 - Python 3.8 or higher
 - pip package manager
+- **Ollama** (for GenAI policy recommendations)
 - Modern web browser
+
+### Ollama Setup
+
+The GenAI policy recommendations feature requires Ollama with the Llama3.2 model:
+
+1. **Install Ollama**
+
+   Download and install from [https://ollama.com](https://ollama.com)
+
+2. **Pull the Llama3.2 model**
+
+   ```bash
+   ollama pull llama3.2
+   ```
+
+3. **Verify installation**
+
+   ```bash
+   ollama list
+   ```
+
+   You should see `llama3.2` in the list of available models.
+
+> **Note**: The Flask app will automatically start and manage the Ollama server when you run `app.py`. If you prefer to manage Ollama manually, you can start it with `ollama serve`.
 
 ### Installation
 
@@ -237,7 +272,7 @@ curl -X POST http://localhost:5000/predict/explain \
 }
 ```
 
-### Prediction with Policy Insights
+### Prediction with GenAI Policy Recommendations
 
 **Endpoint:** `POST /predict/explain-policy`
 
@@ -268,29 +303,22 @@ curl -X POST http://localhost:5000/predict/explain-policy \
         "policy_areas": [
           "Public transport expansion",
           "Energy-efficient buildings",
-          "Urban planning and densification",
-          "Appliance efficiency standards",
-          "Behavioral energy conservation"
+          "Urban planning and densification"
         ]
       }
     }
   ],
   "policy_insights": [
     {
-      "factor": "energy_per_capita",
-      "theme": "Energy Demand Reduction",
-      "why_it_matters": "High total energy consumption across households, transport, and industry",
-      "policy_focus": [
-        "Public transport expansion",
-        "Energy-efficient buildings",
-        "Urban planning and densification",
-        "Appliance efficiency standards",
-        "Behavioral energy conservation"
-      ],
-      "model_signal": "Accounts for 52.3% of the predicted emissions impact"
+      "recommendation": "Strengthen public transport and urban planning initiatives",
+      "rationale": "Energy per capita accounts for 52.3% of emission drivers...",
+      "policy_areas": ["Transport", "Urban Development"],
+      "priority": "High",
+      "source": "genai"
     }
   ],
-  "note": "Policy insights are generated by interpreting model explanations. They are indicative, not prescriptive."
+  "genai_enabled": true,
+  "note": "Policy insights are generated using GenAI analysis of model explanations. They are indicative and context-aware for India's climate policy landscape."
 }
 ```
 
@@ -364,6 +392,7 @@ The UI follows **minimalist modern design principles**:
 | **Backend**           | Flask 2.0+, Flask-CORS          |
 | **ML/Data**           | scikit-learn, pandas, numpy     |
 | **Explainability**    | SHAP                            |
+| **GenAI**             | Ollama (Llama3.2), Requests     |
 | **Visualization**     | matplotlib, seaborn (notebooks) |
 | **Model Persistence** | joblib                          |
 | **Frontend**          | Vanilla HTML5/CSS3/JavaScript   |
@@ -382,26 +411,23 @@ The UI follows **minimalist modern design principles**:
 
 ---
 
+## ✅ Recently Added Features
+
+- [x] **GenAI Policy Recommendations**: Fully implemented using Ollama/Llama3.2
+- [x] **Automatic Ollama Server Management**: App starts and manages Ollama server lifecycle
+- [x] **India-Specific Policy Context**: Tailored recommendations for India's climate transition
+- [x] **Frontend GenAI Integration**: Policy insights displayed alongside ML explanations
+
 ## 💡 Future Enhancements
 
-- [ ] **GenAI Integration**: Implement LLM-powered policy summarization using Ollama (stubs already in place)
 - [ ] Add confidence intervals for predictions
 - [ ] Multi-scenario forecasting (optimistic/pessimistic paths)
-- [ ] Expand to multiple countries
+- [ ] Expand to multiple countries with country-specific policy contexts
 - [ ] Historical data visualization on frontend
 - [ ] Model retraining pipeline with new data
 - [ ] Docker containerization for deployment
 - [ ] Unit tests for core modules
-
-### 🤖 GenAI Integration Ready
-
-The project includes stub files for future generative AI integration:
-
-- `genai/prompts.py` - Prompt template definitions
-- `genai/ollama_client.py` - Ollama API wrapper
-- `genai/summarizer.py` - AI-powered policy summarization
-
-These stubs provide clear extension points for adding LLM-based policy recommendations.
+- [ ] Alternative LLM support (GPT-4, Gemini, etc.)
 
 ---
 
@@ -428,11 +454,12 @@ The modular structure makes development more organized:
 - Add new endpoints to `app.py`
 - Routes are thin and delegate to core/policy modules
 
-**Future AI Integration** (`genai/`):
+**GenAI Integration** (`genai/`):
 
-- Implement Ollama client in `genai/ollama_client.py`
-- Design prompts in `genai/prompts.py`
-- Build summarizers in `genai/summarizer.py`
+- Modify prompt templates in `genai/prompts.py`
+- Extend policy context in `genai/policy_context.py`
+- Customize LLM parameters in `genai/summarizer.py`
+- Switch models by changing `model_name` in `app.py`
 
 ### Explore the Notebooks
 
