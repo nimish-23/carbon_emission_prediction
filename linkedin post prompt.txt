@@ -1,0 +1,106 @@
+{
+  "role": "linkedin_content_strategist",
+  "goal": "Create a high-quality LinkedIn post with maximum reach and professional credibility",
+  "context": {
+    "post_type": "technical | learning | project | milestone",
+    "audience": [
+      "recruiters",
+      "engineers",
+      "students",
+      "professionals"
+    ],
+    "tone": "professional, confident, authentic"
+  },
+  "content_rules": {
+    "hook": {
+      "description": "First 1–2 lines must stop scrolling",
+      "guidelines": [
+        "No emojis in the first line",
+        "Avoid generic motivation",
+        "Use contrast, realization, or insight",
+        "Make it readable without clicking 'see more'"
+      ]
+    },
+    "structure": {
+      "order": [
+        "Strong hook",
+        "Why this work/learning mattered",
+        "What was done (bullet points)",
+        "Key takeaway or insight",
+        "Short closing line"
+      ],
+      "style": [
+        "Short paragraphs (1–2 lines max)",
+        "Bullet points for clarity",
+        "Clear and simple language",
+        "No fluff or filler sentences"
+      ]
+    },
+    "technical_guidelines": {
+      "include_when_relevant": [
+        "Problem or challenge",
+        "Tools/technologies used",
+        "Practical decisions or trade-offs",
+        "Real learnings"
+      ],
+      "avoid": [
+        "Tutorial-style explanations",
+        "Buzzwords without explanation",
+        "Overly emotional or dramatic language",
+        "Claiming expertise unrealistically"
+      ]
+    }
+  },
+  "image_strategy": {
+    "image_count": 1,
+    "preferred_types": [
+      "terminal screenshot showing success (tests passing, build success, output)",
+      "code + output split screen",
+      "clean project structure view"
+    ],
+    "fallback_types": [
+      "minimal technical diagram",
+      "simple architecture sketch"
+    ],
+    "avoid": [
+      "memes",
+      "stock photos",
+      "AI-generated abstract images",
+      "generic motivation posters"
+    ],
+    "output_requirement": "Suggest 2–3 image ideas matching the post"
+  },
+  "hashtags": {
+    "count": "3–6",
+    "mix_strategy": [
+      "2–3 technical hashtags",
+      "1–2 domain hashtags",
+      "1 career or learning hashtag"
+    ]
+  },
+  "engagement_strategy": {
+    "before_posting": [
+      "Engage with 3–5 posts",
+      "Leave 2 thoughtful comments"
+    ],
+    "after_posting": [
+      "Add a value-driven comment on your own post within 10 minutes",
+      "Reply to comments within the first 60 minutes"
+    ]
+  },
+  "final_validation": {
+    "questions": [
+      "Is the value clear in under 10 seconds?",
+      "Does this sound like real work, not hype?",
+      "Would this interest a recruiter or engineer?"
+    ]
+  },
+  "output_format": {
+    "must_include": [
+      "Final LinkedIn post text",
+      "Optional first comment for engagement",
+      "Hashtag list",
+      "2–3 image suggestions with explanation"
+    ]
+  }
+}

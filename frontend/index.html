@@ -1,0 +1,277 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>CarbonCast — India CO₂ Forecasting</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,600;0,9..144,700;1,9..144,300&family=Geist:wght@300;400;500;600&display=swap" rel="stylesheet"/>
+  <link rel="stylesheet" href="style.css"/>
+</head>
+<body>
+
+  <!-- ── HEADER ── -->
+  <header class="header">
+    <div class="header-inner">
+      <div class="brand">
+        <svg class="brand-icon" width="28" height="28" viewBox="0 0 28 28" fill="none">
+          <circle cx="14" cy="14" r="13" stroke="#C4522A" stroke-width="1.5"/>
+          <circle cx="14" cy="14" r="7" fill="#C4522A" opacity="0.15"/>
+          <circle cx="14" cy="14" r="3.5" fill="#C4522A"/>
+          <path d="M14 1 Q20 8 14 14 Q8 8 14 1Z" fill="#C4522A" opacity="0.3"/>
+        </svg>
+        <span class="brand-name">CarbonCast</span>
+        <span class="brand-sub">India</span>
+      </div>
+      <nav class="header-nav">
+        <span class="nav-chip">ML · SHAP · GenAI</span>
+      </nav>
+    </div>
+  </header>
+
+  <!-- ── MAIN ── -->
+  <main class="main">
+
+    <!-- ════ LANDING ════ -->
+    <section class="view" id="viewLanding">
+
+      <div class="landing-layout">
+
+        <!-- Left: copy + input -->
+        <div class="landing-left">
+          <p class="eyebrow">India Atmospheric Intelligence</p>
+          <h1 class="headline">
+            Forecast India's<br/>
+            <em>CO₂ emissions</em><br/>
+            for any year
+          </h1>
+          <p class="body-copy">
+            Enter a target year and get ML-powered CO₂ per capita predictions,
+            SHAP-based driver explanations, and AI policy recommendations —
+            all grounded in historical data from 1965 to 2022.
+          </p>
+
+          <!-- Input card -->
+          <div class="input-card">
+            <div class="input-group">
+              <label class="input-label" for="yearInput">Target Year</label>
+              <div class="input-row">
+                <input
+                  type="number"
+                  id="yearInput"
+                  placeholder="2035"
+                  min="1965" max="2100"
+                  autocomplete="off"
+                />
+                <button class="btn-primary" id="predictBtn" onclick="runPrediction()">
+                  Predict
+                  <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                </button>
+              </div>
+              <p class="input-hint">Valid range: 1965 – 2100</p>
+            </div>
+
+            <!-- Mode toggle -->
+            <div class="mode-row">
+              <span class="mode-label">Mode</span>
+              <div class="seg-control">
+                <button class="seg active" id="segExplain" onclick="setMode('explain')">Explain</button>
+                <button class="seg" id="segPolicy" onclick="setMode('policy')">+ Policy AI</button>
+              </div>
+            </div>
+
+            <!-- Year chips -->
+            <div class="chip-row">
+              <span class="chip-label">Quick select</span>
+              <button class="year-chip" onclick="setYear(2025)">2025</button>
+              <button class="year-chip" onclick="setYear(2030)">2030</button>
+              <button class="year-chip" onclick="setYear(2040)">2040</button>
+              <button class="year-chip" onclick="setYear(2050)">2050</button>
+              <button class="year-chip" onclick="setYear(2075)">2075</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Right: decorative stat block -->
+        <div class="landing-right">
+          <div class="stat-tower">
+            <div class="stat-block primary-stat">
+              <p class="sb-label">Historical Baseline</p>
+              <p class="sb-val">1.89</p>
+              <p class="sb-unit">t CO₂ / person / yr</p>
+            </div>
+            <div class="stat-block">
+              <p class="sb-label">Training Data</p>
+              <p class="sb-val-sm">1965 – 2022</p>
+              <p class="sb-unit">Our World in Data</p>
+            </div>
+            <div class="stat-block">
+              <p class="sb-label">Explainability</p>
+              <p class="sb-val-sm">SHAP</p>
+              <p class="sb-unit">Feature attribution</p>
+            </div>
+            <div class="stat-block">
+              <p class="sb-label">Policy Engine</p>
+              <p class="sb-val-sm">Llama 3.2</p>
+              <p class="sb-unit">Local · private</p>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- ════ LOADING ════ -->
+    <section class="view hidden" id="viewLoading">
+      <div class="loading-wrap">
+        <div class="loading-ring">
+          <svg class="ring-svg" viewBox="0 0 120 120" fill="none">
+            <circle cx="60" cy="60" r="52" stroke="#EDE5D8" stroke-width="3"/>
+            <circle cx="60" cy="60" r="52" stroke="#C4522A" stroke-width="3"
+              stroke-dasharray="327" stroke-dashoffset="327"
+              class="ring-progress" stroke-linecap="round"/>
+          </svg>
+          <div class="ring-inner">
+            <p class="ring-year" id="loadingYear">—</p>
+            <p class="ring-word">computing</p>
+          </div>
+        </div>
+        <div class="loading-steps">
+          <div class="lstep" id="ls1"><span class="lstep-dot"></span>Driver prediction</div>
+          <div class="lstep" id="ls2"><span class="lstep-dot"></span>CO₂ model</div>
+          <div class="lstep" id="ls3"><span class="lstep-dot"></span>SHAP analysis</div>
+          <div class="lstep" id="ls4"><span class="lstep-dot"></span>Policy AI</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ════ RESULTS ════ -->
+    <section class="view hidden" id="viewResults">
+
+      <!-- Results header -->
+      <div class="results-header">
+        <div>
+          <p class="results-eyebrow">India CO₂ Forecast</p>
+          <h2 class="results-year" id="resYear">—</h2>
+        </div>
+        <button class="btn-ghost" onclick="resetView()">← New Prediction</button>
+      </div>
+
+      <!-- ── Hero gauge + side metrics ── -->
+      <div class="results-hero">
+
+        <!-- Gauge -->
+        <div class="gauge-wrap">
+          <svg class="gauge-svg" viewBox="0 0 300 200" fill="none">
+            <!-- Track arc (180° semicircle, bottom half) -->
+            <path id="gaugeTrack"
+              d="M 30 175 A 120 120 0 0 1 270 175"
+              stroke="#EDE5D8" stroke-width="18" stroke-linecap="round"/>
+            <!-- Value arc -->
+            <path id="gaugeFill"
+              d="M 30 175 A 120 120 0 0 1 270 175"
+              stroke="#C4522A" stroke-width="18" stroke-linecap="round"
+              stroke-dasharray="377" stroke-dashoffset="377"
+              class="gauge-fill-path"/>
+            <!-- Needle -->
+            <line id="gaugeNeedle"
+              x1="150" y1="175" x2="150" y2="60"
+              stroke="#7A3018" stroke-width="2.5" stroke-linecap="round"
+              transform="rotate(0, 150, 175)"
+              class="gauge-needle"/>
+            <circle cx="150" cy="175" r="7" fill="#7A3018"/>
+            <!-- Scale labels -->
+            <text x="24" y="196" fill="#B89F8A" font-size="10" font-family="Geist,sans-serif">0</text>
+            <text x="86" y="64" fill="#B89F8A" font-size="10" font-family="Geist,sans-serif" text-anchor="middle">2</text>
+            <text x="150" y="42" fill="#B89F8A" font-size="10" font-family="Geist,sans-serif" text-anchor="middle">3</text>
+            <text x="214" y="64" fill="#B89F8A" font-size="10" font-family="Geist,sans-serif" text-anchor="middle">4</text>
+            <text x="270" y="196" fill="#B89F8A" font-size="10" font-family="Geist,sans-serif" text-anchor="end">5+</text>
+          </svg>
+          <!-- Central readout below needle pivot -->
+          <div class="gauge-readout">
+            <p class="gr-val" id="grVal">—</p>
+            <p class="gr-unit">t CO₂ / person / yr</p>
+            <div class="gr-delta" id="grDelta"></div>
+          </div>
+        </div>
+
+        <!-- Side cards -->
+        <div class="side-metrics">
+          <div class="smet-card" id="smBaseline">
+            <p class="smet-label">Historical Baseline</p>
+            <p class="smet-val" id="smBaselineVal">—</p>
+            <p class="smet-note">avg 1965–2022</p>
+          </div>
+          <div class="smet-card accent" id="smDelta">
+            <p class="smet-label">Change vs Baseline</p>
+            <p class="smet-val" id="smDeltaVal">—</p>
+            <p class="smet-note" id="smDeltaNote">—</p>
+          </div>
+          <div class="smet-card" id="smTopDriver">
+            <p class="smet-label">Primary Driver</p>
+            <p class="smet-val smet-val-sm" id="smTopDriverVal">—</p>
+            <p class="smet-note">highest SHAP impact</p>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- ── Tabs ── -->
+      <div class="tabs-bar">
+        <button class="tab active" data-tab="shap" onclick="switchTab('shap')">SHAP Analysis</button>
+        <button class="tab" data-tab="drivers" onclick="switchTab('drivers')">Energy Drivers</button>
+        <button class="tab" data-tab="policy" onclick="switchTab('policy')" id="tabPolicy">Policy Insights</button>
+      </div>
+
+      <!-- ── Tab panels ── -->
+      <div class="tab-body">
+
+        <!-- SHAP -->
+        <div class="tab-panel active" id="tp-shap">
+          <p class="panel-desc">Each bar shows how an energy driver pushes the prediction above (↑) or below (↓) the historical average.</p>
+          <div class="shap-list" id="shapList"></div>
+          <div class="shap-sum" id="shapSum"></div>
+        </div>
+
+        <!-- Drivers -->
+        <div class="tab-panel" id="tp-drivers">
+          <p class="panel-desc">ML-projected values for each energy driver in the target year, used as inputs to the CO₂ model.</p>
+          <div class="drivers-grid" id="driversGrid"></div>
+          <p class="panel-warn">⚠  Projections beyond 2050 involve extrapolation and carry higher uncertainty.</p>
+        </div>
+
+        <!-- Policy -->
+        <div class="tab-panel" id="tp-policy">
+          <div id="policyContent">
+            <div class="policy-empty">
+              <div class="pe-icon">🏛</div>
+              <p class="pe-title">Policy AI not loaded</p>
+              <p class="pe-body">Switch to <strong>+ Policy AI</strong> mode, or click below to load insights for this year.</p>
+              <button class="btn-outline" onclick="loadPolicy()">Generate Policy Insights</button>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+    </section>
+
+  </main>
+
+  <!-- ── FOOTER ── -->
+  <footer class="footer">
+    <span>Data: Our World in Data · 1965–2022 · India</span>
+    <span>Model: scikit-learn · SHAP · Llama 3.2</span>
+  </footer>
+
+  <!-- Error toast -->
+  <div class="toast hidden" id="toast">
+    <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="8" r="7" stroke="#C4522A" stroke-width="1.5"/><path d="M8 5v4M8 10.5v.5" stroke="#C4522A" stroke-width="1.5" stroke-linecap="round"/></svg>
+    <span id="toastMsg"></span>
+    <button onclick="closeToast()">✕</button>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>
